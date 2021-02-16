@@ -4,7 +4,7 @@
   "description": "Todo application Backend created using Koa, MongoDB",
   "main": "index.js",
   "scripts": {
-    "start": "node src --exec babel-node",
+    "start": "node -r esm index.js",
     "start:dev": "nodemon --watch src/ src/index.js --exec babel-node",
     "test": "jest",
     "test:watch": "npm run test -- --watch-all",
@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-logger": "^3.2.1",
