@@ -4,7 +4,7 @@
   "description": "Todo application Backend created using Koa, MongoDB",
   "main": "index.js",
   "scripts": {
-    "start": "node src --exec babel-node",
+    "start": "babel-node src/index.js",
     "start:dev": "nodemon --watch src/ src/index.js --exec babel-node",
     "test": "jest",
     "test:watch": "npm run test -- --watch-all",
