@@ -22,6 +22,6 @@ describe('app', () => {
     const { status, text } = await request(app.callback()).get('/');
 
     expect(status).toBe(200);
-    expect(text).toMatchSnapshot();
+    expect(text).toBe('Hello World!');
   });
 });
