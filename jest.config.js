@@ -1,4 +1,5 @@
 module.exports = {
+  preset: '@shelf/jest-mongodb',
   setupFilesAfterEnv: [
     'jest-plugin-context/setup',
   ],
@@ -10,7 +11,7 @@ module.exports = {
       statements: 100,
     },
   },
-  testEnvironment: 'node',
+  displayName: 'unittest',
   transform: {
     '^.+\\.(js)?$': 'babel-jest',
   },

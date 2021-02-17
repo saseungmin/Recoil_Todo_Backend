@@ -4,6 +4,14 @@ import Router from 'koa-router';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 
+import { connectDatabase } from './connect';
+
+require('dotenv').config();
+
+const { MONGO_URI } = process.env;
+
+connectDatabase(MONGO_URI);
+
 const app = new Koa();
 const router = new Router();
 
