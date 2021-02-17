@@ -17,5 +17,5 @@ build
 ## .env
 .env
 
-## globalConfig.json
+## mongo test
 globalConfig.json
