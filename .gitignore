@@ -3,6 +3,7 @@ node_modules
 
 ## Jest
 coverage
+__snapshots__
 
 ## build
 build
