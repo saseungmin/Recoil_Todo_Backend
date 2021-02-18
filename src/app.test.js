@@ -4,24 +4,71 @@ import mongoose from 'mongoose';
 
 import app from './app';
 
-jest.mock('mongoose');
-
 describe('app', () => {
-  let connection;
-
   beforeAll(async () => {
-    connection = await mongoose.connect('mock_url',
-      { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+    await mongoose.connect(global.__MONGO_URI__,
+      { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true },
+      (err) => {
+        if (err) {
+          process.exit(1);
+        }
+      });
   });
 
   afterAll(async () => {
-    await connection.close();
+    await mongoose.disconnect();
   });
 
-  it('Hello world works', async () => {
+  it('response 200 and "Recoil_Todo_Backend"', async () => {
     const { status, text } = await request(app.callback()).get('/');
 
     expect(status).toBe(200);
-    expect(text).toBe('Hello World!');
+    expect(text).toBe('Recoil_Todo_Backend');
+  });
+
+  describe('POST /api/auth/register', () => {
+    context("Isn't Error", () => {
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
+      it('Response is Success Status', async () => {
+        const { body, status } = await request(app.callback())
+          .post('/api/auth/register')
+          .send(payload);
+
+        expect(status).toBe(201);
+        expect(body).toHaveProperty('id', 'seugmin');
+      });
+    });
+
+    context('Response is Error Status', () => {
+      it('When the password does not exist response 400', async () => {
+        const payload = {
+          id: 'seugmin',
+        };
+
+        const { body, status } = await request(app.callback())
+          .post('/api/auth/register')
+          .send(payload);
+
+        expect(status).toBe(400);
+        expect(body.details[0]).toHaveProperty('message', '"password" is required');
+      });
+
+      it('When duplicate ID exists response 409', async () => {
+        const payload = {
+          id: 'seugmin',
+          password: '123',
+        };
+
+        const { status } = await request(app.callback())
+          .post('/api/auth/register')
+          .send(payload);
+
+        expect(status).toBe(409);
+      });
+    });
   });
 });

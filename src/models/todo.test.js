@@ -10,10 +10,8 @@ describe('User model', () => {
     createdAt: new Date(),
   };
 
-  let connection;
-
   beforeAll(async () => {
-    connection = await mongoose.connect(global.__MONGO_URI__,
+    await mongoose.connect(global.__MONGO_URI__,
       { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true },
       (err) => {
         if (err) {
@@ -23,7 +21,7 @@ describe('User model', () => {
   });
 
   afterAll(async () => {
-    await connection.close();
+    await mongoose.disconnect();
   });
 
   it('create & save todo successfully', async () => {
