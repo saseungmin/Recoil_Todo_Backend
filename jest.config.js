@@ -1,5 +1,6 @@
 module.exports = {
   preset: '@shelf/jest-mongodb',
+  setupFiles: ['<rootDir>/__mocks__/setEnvVars.js'],
   setupFilesAfterEnv: [
     'jest-plugin-context/setup',
   ],

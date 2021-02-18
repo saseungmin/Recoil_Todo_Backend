@@ -4,7 +4,8 @@ import Router from 'koa-router';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 
-import { connectDatabase } from './connect';
+import { connectDatabase } from './lib/connect';
+import api from './api';
 
 require('dotenv').config();
 
@@ -18,10 +19,13 @@ const router = new Router();
 app.use(logger());
 
 router.get('/', (ctx) => {
-  ctx.body = 'Hello World!';
+  ctx.body = 'Recoil_Todo_Backend';
 });
 
+router.use('/api', api.routes());
+
 app.use(bodyParser());
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 

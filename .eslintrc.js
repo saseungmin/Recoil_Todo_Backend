@@ -42,5 +42,6 @@ module.exports = {
     'import/no-absolute-path': 'error',
     'consistent-return': 'off',
     'no-underscore-dangle': ['error', { allow: ['__MONGO_URI__', '_id'] }],
+    'func-names': 'off',
   },
 };

@@ -9,10 +9,8 @@ describe('User model', () => {
     createdAt: new Date(),
   };
 
-  let connection;
-
   beforeAll(async () => {
-    connection = await mongoose.connect(global.__MONGO_URI__,
+    await mongoose.connect(global.__MONGO_URI__,
       { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true },
       (err) => {
         if (err) {
@@ -22,7 +20,7 @@ describe('User model', () => {
   });
 
   afterAll(async () => {
-    await connection.close();
+    await mongoose.disconnect();
   });
 
   it('create & save user successfully', async () => {
@@ -59,5 +57,32 @@ describe('User model', () => {
       expect(error).toBeInstanceOf(mongoose.Error.ValidationError);
       expect(error.errors.hashedPassword).toBeDefined();
     }
+  });
+
+  it('should findByUserId statics method exist id', async () => {
+    const { id } = await User.findByUserId('test');
+
+    expect(id).toBe('test');
+  });
+
+  it('should setPassword method Convert to hash value and save', async () => {
+    const noneHashedPassword = 'test123';
+
+    const user = new User({ id: 'test11' });
+
+    await user.setPassword(noneHashedPassword);
+
+    const { hashedPassword } = await user.save();
+
+    expect(hashedPassword).not.toBe(noneHashedPassword);
+  });
+
+  it('should the hashed password is deleted and returned', async () => {
+    const user = new User({ id: 'test123', hashedPassword: '123' });
+
+    const { hashedPassword, id } = await user.serialize();
+
+    expect(id).toBe('test123');
+    expect(hashedPassword).toBeUndefined();
   });
 });
