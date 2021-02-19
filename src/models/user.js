@@ -2,6 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 import bcrypt from 'bcrypt';
 
+import jwt from 'jsonwebtoken';
+
 const UserSchema = new Schema({
   id: {
     type: String,
@@ -33,6 +35,21 @@ UserSchema.methods.serialize = function () {
 
   delete data.hashedPassword;
   return data;
+};
+
+UserSchema.methods.generateToken = function () {
+  const token = jwt.sign(
+    {
+      _id: this._id,
+      id: this.id,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '5d',
+    },
+  );
+
+  return token;
 };
 
 const User = mongoose.model('User', UserSchema);
