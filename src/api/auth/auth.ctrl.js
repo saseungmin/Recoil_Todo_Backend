@@ -1,6 +1,6 @@
 import User from '../../models/user';
 
-import { validateUser } from '../../lib/validate';
+import { validateUser } from '../../utils/validate';
 
 export const register = async (ctx) => {
   const { error } = validateUser(ctx.request.body);
@@ -28,6 +28,13 @@ export const register = async (ctx) => {
     await user.save();
 
     ctx.body = user.serialize();
+
+    const token = user.generateToken();
+
+    ctx.cookies.set('access_token', token, {
+      maxAge: 1000 * 60 * 60 * 24 * 5,
+      httpOnly: true,
+    });
     ctx.status = 201;
   } catch (e) {
     ctx.throw(500, e);

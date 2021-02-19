@@ -4,7 +4,9 @@ import Router from 'koa-router';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 
-import { connectDatabase } from './lib/connect';
+import { connectDatabase } from './utils/connect';
+import jwtMiddleware from './lib/jwtMiddleware';
+
 import api from './api';
 
 require('dotenv').config();
@@ -25,6 +27,7 @@ router.get('/', (ctx) => {
 router.use('/api', api.routes());
 
 app.use(bodyParser());
+app.use(jwtMiddleware);
 
 app.use(router.routes());
 app.use(router.allowedMethods());

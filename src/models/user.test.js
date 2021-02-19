@@ -85,4 +85,12 @@ describe('User model', () => {
     expect(id).toBe('test123');
     expect(hashedPassword).toBeUndefined();
   });
+
+  it('should sign to jsonwebtoken', async () => {
+    const user = new User({ id: '1', hashedPassword: '123' });
+
+    const token = await user.generateToken();
+
+    expect(token).toBeDefined();
+  });
 });

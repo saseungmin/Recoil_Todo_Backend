@@ -34,7 +34,7 @@ describe('app', () => {
       };
 
       it('Response is Success Status', async () => {
-        const { body, status } = await request(app.callback())
+        const { status, body } = await request(app.callback())
           .post('/api/auth/register')
           .send(payload);
 
