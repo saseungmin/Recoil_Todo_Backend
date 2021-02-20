@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
-import { register } from './auth.ctrl';
+import { register, login } from './auth.ctrl';
+
 import User from '../../models/user';
 
 describe('/auth', () => {
@@ -44,6 +45,38 @@ describe('/auth', () => {
 
     try {
       await register(payload);
+      await user();
+    } catch (e) {
+      expect(e).toEqual(error);
+    }
+  });
+
+  it('response 500 /login', async () => {
+    const error = new Error('error');
+
+    const user = jest.spyOn(User, 'findByUserId')
+      .mockRejectedValue(error);
+
+    beforeEach(() => {
+      user.mockClear();
+    });
+
+    afterEach(() => {
+      user.mockRestore();
+    });
+
+    const payload = {
+      request: {
+        body: {
+          id: 'test',
+          password: 'test',
+        },
+      },
+      throw: () => {},
+    };
+
+    try {
+      await login(payload);
       await user();
     } catch (e) {
       expect(e).toEqual(error);
