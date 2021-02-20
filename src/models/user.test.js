@@ -93,4 +93,12 @@ describe('User model', () => {
 
     expect(token).toBeDefined();
   });
+
+  it('check for correct password', async () => {
+    const user = new User({ id: '1', hashedPassword: '123' });
+
+    const result = await user.checkPassword('123');
+
+    expect(result).toBeFalsy();
+  });
 });

@@ -71,4 +71,62 @@ describe('app', () => {
       });
     });
   });
+
+  describe('POST /api/auth/login', () => {
+    context("Isn't Error status", () => {
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
+      it('Response is Success Status response 200', async () => {
+        const { status, body } = await request(app.callback())
+          .post('/api/auth/login')
+          .send(payload);
+
+        expect(status).toBe(200);
+        expect(body).toHaveProperty('id', 'seugmin');
+      });
+    });
+
+    context('Response is Error Status', () => {
+      it('When the password and id does not exist response 401', async () => {
+        const payload = {
+          id: 'seugmin',
+        };
+
+        const { status } = await request(app.callback())
+          .post('/api/auth/login')
+          .send(payload);
+
+        expect(status).toBe(401);
+      });
+
+      it('When the user ID does not exist response 401', async () => {
+        const payload = {
+          id: 'notFound',
+          password: '123',
+        };
+
+        const { status } = await request(app.callback())
+          .post('/api/auth/login')
+          .send(payload);
+
+        expect(status).toBe(401);
+      });
+
+      it('When passwords do not match response 401', async () => {
+        const payload = {
+          id: 'seugmin',
+          password: '123',
+        };
+
+        const { status } = await request(app.callback())
+          .post('/api/auth/login')
+          .send(payload);
+
+        expect(status).toBe(401);
+      });
+    });
+  });
 });
