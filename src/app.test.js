@@ -129,4 +129,70 @@ describe('app', () => {
       });
     });
   });
+
+  describe('GET /api/auth/check', () => {
+    context("Isn't Error status", () => {
+      let sessionCookie;
+
+      beforeEach(async () => {
+        const payload = {
+          id: 'seugmin',
+          password: 'test123',
+        };
+
+        const response = await request(app.callback())
+          .post('/api/auth/login')
+          .send(payload);
+
+        sessionCookie = response.header['set-cookie'][0]
+          .split(',')
+          .map((cookie) => cookie.split(';')[0]);
+      });
+
+      it('Response is Success response user status', async () => {
+        const { status, body } = await request(app.callback())
+          .get('/api/auth/check')
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(200);
+        expect(body).toHaveProperty('id', 'seugmin');
+      });
+    });
+
+    context('Response is Error Status', () => {
+      it('When not found user state response 401', async () => {
+        const { status } = await request(app.callback())
+          .get('/api/auth/check');
+
+        expect(status).toBe(401);
+      });
+    });
+  });
+
+  describe('POST /api/auth/logout', () => {
+    let sessionCookie;
+
+    beforeEach(async () => {
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
+      const response = await request(app.callback())
+        .post('/api/auth/login')
+        .send(payload);
+
+      sessionCookie = response.header['set-cookie'][0]
+        .split(',')
+        .map((cookie) => cookie.split(';')[0]);
+    });
+
+    it('When logout success, delete cookie Response 204', async () => {
+      const { status } = await request(app.callback())
+        .post('/api/auth/logout')
+        .set('Cookie', sessionCookie);
+
+      expect(status).toBe(204);
+    });
+  });
 });
