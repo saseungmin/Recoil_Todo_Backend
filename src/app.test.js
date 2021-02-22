@@ -19,6 +19,16 @@ describe('app', () => {
     await mongoose.disconnect();
   });
 
+  const setSessionCookie = async (payload) => {
+    const response = await request(app.callback())
+      .post('/api/auth/login')
+      .send(payload);
+
+    return response.header['set-cookie'][0]
+      .split(',')
+      .map((cookie) => cookie.split(';')[0]);
+  };
+
   it('response 200 and "Recoil_Todo_Backend"', async () => {
     const { status, text } = await request(app.callback()).get('/');
 
@@ -134,19 +144,13 @@ describe('app', () => {
     context("Isn't Error status", () => {
       let sessionCookie;
 
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
       beforeEach(async () => {
-        const payload = {
-          id: 'seugmin',
-          password: 'test123',
-        };
-
-        const response = await request(app.callback())
-          .post('/api/auth/login')
-          .send(payload);
-
-        sessionCookie = response.header['set-cookie'][0]
-          .split(',')
-          .map((cookie) => cookie.split(';')[0]);
+        sessionCookie = await setSessionCookie(payload);
       });
 
       it('Response is Success response user status', async () => {
@@ -172,19 +176,13 @@ describe('app', () => {
   describe('POST /api/auth/logout', () => {
     let sessionCookie;
 
+    const payload = {
+      id: 'seugmin',
+      password: 'test123',
+    };
+
     beforeEach(async () => {
-      const payload = {
-        id: 'seugmin',
-        password: 'test123',
-      };
-
-      const response = await request(app.callback())
-        .post('/api/auth/login')
-        .send(payload);
-
-      sessionCookie = response.header['set-cookie'][0]
-        .split(',')
-        .map((cookie) => cookie.split(';')[0]);
+      sessionCookie = await setSessionCookie(payload);
     });
 
     it('When logout success, delete cookie Response 204', async () => {
@@ -193,6 +191,53 @@ describe('app', () => {
         .set('Cookie', sessionCookie);
 
       expect(status).toBe(204);
+    });
+  });
+
+  describe('POST /api/todos', () => {
+    let sessionCookie;
+
+    const payload = {
+      id: 'seugmin',
+      password: 'test123',
+    };
+
+    beforeEach(async () => {
+      sessionCookie = await setSessionCookie(payload);
+    });
+
+    context('validation fails', () => {
+      it('When task field is empty Response 400', async () => {
+        const payload = {
+          task: '',
+          isComplete: false,
+        };
+
+        const { status, body } = await request(app.callback())
+          .post('/api/todos')
+          .set('Cookie', sessionCookie)
+          .send(payload);
+
+        expect(status).toBe(400);
+        expect(body.details[0].message).toBe('"task" is not allowed to be empty');
+      });
+    });
+
+    context('validation success', () => {
+      it('When successful todo save, Response 201', async () => {
+        const payload = {
+          task: 'task',
+          isComplete: false,
+        };
+
+        const { status, body } = await request(app.callback())
+          .post('/api/todos')
+          .set('Cookie', sessionCookie)
+          .send(payload);
+
+        expect(status).toBe(201);
+        expect(body).toHaveProperty('task', payload.task);
+      });
     });
   });
 });

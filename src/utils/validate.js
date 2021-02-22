@@ -15,4 +15,15 @@ export const validateUser = (value) => {
   return schema.validate(value);
 };
 
-export const temp = [];
+export const validateTodo = (value) => {
+  const schema = Joi.object().keys({
+    task: Joi
+      .string()
+      .required(),
+    isComplete: Joi
+      .boolean()
+      .default(false),
+  });
+
+  return schema.validate(value);
+};
