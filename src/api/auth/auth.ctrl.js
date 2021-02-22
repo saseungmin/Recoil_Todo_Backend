@@ -3,7 +3,7 @@ import User from '../../models/user';
 import { validateUser } from '../../utils/validate';
 
 export const register = async (ctx) => {
-  const { error } = validateUser(ctx.request.body);
+  const { error, value } = validateUser(ctx.request.body);
 
   if (error) {
     ctx.status = 400;
@@ -12,7 +12,7 @@ export const register = async (ctx) => {
     return;
   }
 
-  const { id, password } = ctx.request.body;
+  const { id, password } = value;
 
   try {
     const exist = await User.findByUserId(id);

@@ -4,7 +4,10 @@ import Todo from './todo';
 
 describe('User model', () => {
   const todoData = {
-    id: '1',
+    writer: {
+      _id: mongoose.Types.ObjectId('mockobjectid'),
+      id: 'idd',
+    },
     task: 'test',
     isComplete: false,
     createdAt: new Date(),
@@ -28,11 +31,11 @@ describe('User model', () => {
     const validUser = new Todo(todoData);
 
     const {
-      _id, id, task, isComplete, createdAt,
+      _id, task, isComplete, createdAt, writer,
     } = await validUser.save();
 
     expect(_id).toBeDefined();
-    expect(id).toBe(todoData.id);
+    expect(writer).toEqual(todoData.writer);
     expect(task).toBe(todoData.task);
     expect(isComplete).toBe(todoData.isComplete);
     expect(createdAt).toBe(todoData.createdAt);
@@ -40,7 +43,6 @@ describe('User model', () => {
 
   it('insert todo successfully, but the field does not defined in schema should be undefined', async () => {
     const userWithInvalidField = new Todo({
-      id: '2',
       task: 'test123',
       createdAt: new Date(),
       name: 'testname',

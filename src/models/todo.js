@@ -1,9 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 const TodoSchema = new Schema({
-  id: {
-    type: String,
-    required: true,
+  writer: {
+    _id: mongoose.Types.ObjectId,
+    id: String,
   },
   task: {
     type: String,
