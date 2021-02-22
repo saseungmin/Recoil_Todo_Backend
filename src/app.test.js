@@ -240,4 +240,36 @@ describe('app', () => {
       });
     });
   });
+
+  describe('GET /api/todos', () => {
+    let sessionCookie;
+
+    const payload = {
+      id: 'seugmin',
+      password: 'test123',
+    };
+
+    beforeEach(async () => {
+      sessionCookie = await setSessionCookie(payload);
+
+      const todo = {
+        task: 'task1',
+        isComplete: false,
+      };
+
+      await request(app.callback())
+        .post('/api/todos')
+        .set('Cookie', sessionCookie)
+        .send(todo);
+    });
+
+    it('When successful load to todos, Response 200', async () => {
+      const { status, body } = await request(app.callback())
+        .get('/api/todos')
+        .set('Cookie', sessionCookie);
+
+      expect(status).toBe(200);
+      expect(body[0]).toHaveProperty('task', 'task1');
+    });
+  });
 });

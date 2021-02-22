@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { write } from './todos.ctrl';
+import { write, list } from './todos.ctrl';
 
 const mockSave = jest.fn().mockRejectedValue(new Error('error'));
 
@@ -39,6 +39,29 @@ describe('/todos', () => {
 
     try {
       await write(payload);
+    } catch (e) {
+      expect(e).toEqual(error);
+    }
+  });
+
+  it('GET response 500 /', async () => {
+    const error = new Error('error');
+
+    const payload = {
+      state: {
+        user: 'user',
+      },
+      request: {
+        body: {
+          task: 'test',
+          isComplete: false,
+        },
+      },
+      throw: () => {},
+    };
+
+    try {
+      await list(payload);
     } catch (e) {
       expect(e).toEqual(error);
     }

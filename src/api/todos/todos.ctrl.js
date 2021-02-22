@@ -29,4 +29,19 @@ export const write = async (ctx) => {
   }
 };
 
-export const temp = [];
+export const list = async (ctx) => {
+  const { user } = ctx.state;
+
+  try {
+    const todos = await Todo.find()
+      .where('writer._id')
+      .equals(user._id)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    ctx.body = todos;
+  } catch (error) {
+    ctx.throw(500, error);
+  }
+};
