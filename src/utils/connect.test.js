@@ -11,6 +11,7 @@ describe('connectDatabase', () => {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   };
 
   const consoleLogSpyOn = jest.spyOn(console, 'log');

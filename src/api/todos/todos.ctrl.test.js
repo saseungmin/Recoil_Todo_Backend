@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-import { write, list } from './todos.ctrl';
+import {
+  write, list, remove, getTodoById,
+} from './todos.ctrl';
 
 const mockSave = jest.fn().mockRejectedValue(new Error('error'));
 
@@ -64,6 +66,42 @@ describe('/todos', () => {
       await list(payload);
     } catch (e) {
       expect(e).toEqual(error);
+    }
+  });
+
+  it('DELETE response 500 /', async () => {
+    const error = new Error('error');
+
+    const payload = {
+      params: {
+        id: 'testId',
+      },
+      throw: () => {},
+    };
+
+    try {
+      await remove(payload);
+    } catch (e) {
+      expect(e).toEqual(error);
+    }
+  });
+
+  it('"getTodoById" response 500 /', async () => {
+    const error = new Error('error');
+
+    const payload = {
+      params: {
+        id: mongoose.Types.ObjectId('testobjectid'),
+      },
+      throw: () => {},
+    };
+    const next = jest.fn();
+
+    try {
+      await getTodoById(payload, next);
+    } catch (e) {
+      expect(e).toEqual(error);
+      expect(next).toBeCalledTimes(1);
     }
   });
 });
