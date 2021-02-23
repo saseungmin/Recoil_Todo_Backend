@@ -12,7 +12,12 @@ export function callback(err) {
 export function connectDatabase(mongoUrl) {
   return mongoose.connect(
     mongoUrl,
-    { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true },
+    {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    },
     callback,
   );
 }

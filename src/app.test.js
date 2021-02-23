@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 
 import app from './app';
 
+const { ObjectId } = mongoose.Types;
+
 describe('app', () => {
   beforeAll(async () => {
     await mongoose.connect(global.__MONGO_URI__,
@@ -27,6 +29,14 @@ describe('app', () => {
     return response.header['set-cookie'][0]
       .split(',')
       .map((cookie) => cookie.split(';')[0]);
+  };
+
+  const insertTodo = (cookie) => async (payload) => {
+    const { body } = await request(app.callback())
+      .post('/api/todos')
+      .set('Cookie', cookie)
+      .send(payload);
+    return body;
   };
 
   it('response 200 and "Recoil_Todo_Backend"', async () => {
@@ -257,10 +267,7 @@ describe('app', () => {
         isComplete: false,
       };
 
-      await request(app.callback())
-        .post('/api/todos')
-        .set('Cookie', sessionCookie)
-        .send(todo);
+      await insertTodo(sessionCookie)(todo);
     });
 
     it('When successful load to todos, Response 200', async () => {
@@ -270,6 +277,55 @@ describe('app', () => {
 
       expect(status).toBe(200);
       expect(body[0]).toHaveProperty('task', 'task1');
+    });
+  });
+
+  describe('DELETE /api/todos/:id', () => {
+    let sessionCookie;
+    let response;
+
+    const payload = {
+      id: 'seugmin',
+      password: 'test123',
+    };
+
+    beforeEach(async () => {
+      sessionCookie = await setSessionCookie(payload);
+
+      const todo = {
+        task: 'task2',
+        isComplete: false,
+      };
+
+      response = await insertTodo(sessionCookie)(todo);
+    });
+
+    context('Is Error status', () => {
+      it('When the objectId is invalid, Response 400', async () => {
+        const { status } = await request(app.callback())
+          .delete('/api/todos/1')
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(400);
+      });
+
+      it("Couldn't find todo with that ObjectId, Response 404", async () => {
+        const { status } = await request(app.callback())
+          .delete(`/api/todos/${ObjectId('mockobjectid')}`)
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(404);
+      });
+    });
+
+    context('Is Successful Status', () => {
+      it('Remove Todo, Response 204', async () => {
+        const { status } = await request(app.callback())
+          .delete(`/api/todos/${response._id}`)
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(204);
+      });
     });
   });
 });
