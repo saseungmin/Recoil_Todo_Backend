@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import {
-  write, list, remove, getTodoById,
+  write, list, remove, getTodoById, update,
 } from './todos.ctrl';
 
 const mockSave = jest.fn().mockRejectedValue(new Error('error'));
@@ -69,7 +69,7 @@ describe('/todos', () => {
     }
   });
 
-  it('DELETE response 500 /', async () => {
+  it('DELETE response 500 /:id', async () => {
     const error = new Error('error');
 
     const payload = {
@@ -86,7 +86,30 @@ describe('/todos', () => {
     }
   });
 
-  it('"getTodoById" response 500 /', async () => {
+  it('PATCH response 500 /:id', async () => {
+    const error = new Error('error');
+
+    const payload = {
+      params: {
+        id: 'testId',
+      },
+      request: {
+        body: {
+          task: 'test',
+          isComplete: false,
+        },
+      },
+      throw: () => {},
+    };
+
+    try {
+      await update(payload);
+    } catch (e) {
+      expect(e).toEqual(error);
+    }
+  });
+
+  it('"getTodoById" response 500 /:id', async () => {
     const error = new Error('error');
 
     const payload = {

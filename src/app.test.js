@@ -48,18 +48,21 @@ describe('app', () => {
 
   describe('POST /api/auth/register', () => {
     context("Isn't Error", () => {
-      const payload = {
-        id: 'seugmin',
-        password: 'test123',
-      };
-
-      it('Response is Success Status', async () => {
+      it('Response is Success Status 201', async () => {
+        const payload = {
+          id: 'seugmin',
+          password: 'test123',
+        };
         const { status, body } = await request(app.callback())
           .post('/api/auth/register')
           .send(payload);
 
+        await request(app.callback())
+          .post('/api/auth/register')
+          .send({ id: 'seungmin', password: 'test123' });
+
         expect(status).toBe(201);
-        expect(body).toHaveProperty('id', 'seugmin');
+        expect(body).toHaveProperty('id', payload.id);
       });
     });
 
@@ -325,6 +328,76 @@ describe('app', () => {
           .set('Cookie', sessionCookie);
 
         expect(status).toBe(204);
+      });
+    });
+  });
+
+  describe('PATCH /api/todos/:id', () => {
+    let sessionCookie;
+    let response;
+
+    beforeEach(async () => {
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
+      sessionCookie = await setSessionCookie(payload);
+
+      const todo = {
+        task: 'task2',
+        isComplete: false,
+      };
+
+      response = await insertTodo(sessionCookie)(todo);
+    });
+
+    context('Is Error status', () => {
+      const payload = {
+        task: '',
+      };
+
+      it('When the todo contents is invalid, Response 400', async () => {
+        const { body, status } = await request(app.callback())
+          .patch(`/api/todos/${response._id}`)
+          .send(payload)
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(400);
+        expect(body.details[0].message).toBe('"task" is not allowed to be empty');
+      });
+
+      it('When it is not my Todo information, Response 403', async () => {
+        const user = {
+          id: 'seungmin',
+          password: 'test123',
+        };
+
+        const mockCookie = await setSessionCookie(user);
+        const { status } = await request(app.callback())
+          .patch(`/api/todos/${response._id}`)
+          .send({ task: 'task1' })
+          .set('Cookie', mockCookie);
+
+        expect(status).toBe(403);
+      });
+    });
+
+    context('Is Successful Status', () => {
+      const payload = {
+        task: 'task1',
+        isComplete: true,
+      };
+
+      it('Update Todo, Response 200', async () => {
+        const { status, body } = await request(app.callback())
+          .patch(`/api/todos/${response._id}`)
+          .send(payload)
+          .set('Cookie', sessionCookie);
+
+        expect(status).toBe(200);
+        expect(body.isComplete).toBe(payload.isComplete);
+        expect(body.task).toBe(payload.task);
       });
     });
   });
