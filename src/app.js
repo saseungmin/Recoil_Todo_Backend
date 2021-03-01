@@ -3,6 +3,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
 
 import { connectDatabase } from './utils/connect';
 import jwtMiddleware from './lib/jwtMiddleware';
@@ -25,6 +26,8 @@ router.get('/', (ctx) => {
 });
 
 router.use('/api', api.routes());
+
+app.use(cors());
 
 app.use(bodyParser());
 app.use(jwtMiddleware);
