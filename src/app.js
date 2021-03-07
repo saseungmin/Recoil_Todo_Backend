@@ -14,11 +14,6 @@ require('dotenv').config();
 
 const { MONGO_URI } = process.env;
 
-const corsOptions = {
-  origin: '*',
-  credentials: true,
-};
-
 connectDatabase(MONGO_URI);
 
 const app = new Koa();
@@ -33,7 +28,9 @@ router.get('/', (ctx) => {
 
 router.use('/api', api.routes());
 
-app.use(cors(corsOptions));
+app.use(cors({
+  credentials: true,
+}));
 
 app.use(bodyParser());
 app.use(jwtMiddleware);
