@@ -19,6 +19,7 @@ connectDatabase(MONGO_URI);
 const app = new Koa();
 const router = new Router();
 
+app.proxy = true;
 app.use(logger());
 
 router.get('/', (ctx) => {
