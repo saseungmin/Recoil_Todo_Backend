@@ -1,6 +1,7 @@
 import User from '../../models/user';
 
 import { validateUser } from '../../utils/validate';
+import cookieOptions from '../../utils/cookieOptions';
 
 export const register = async (ctx) => {
   const { error, value } = validateUser(ctx.request.body);
@@ -31,10 +32,7 @@ export const register = async (ctx) => {
 
     const token = user.generateToken();
 
-    ctx.cookies.set('access_token', token, {
-      maxAge: 1000 * 60 * 60 * 24 * 5,
-      httpOnly: true,
-    });
+    ctx.cookies.set('access_token', token, cookieOptions);
     ctx.status = 201;
   } catch (e) {
     ctx.throw(500, e);
@@ -68,10 +66,7 @@ export const login = async (ctx) => {
 
     const token = user.generateToken();
 
-    ctx.cookies.set('access_token', token, {
-      maxAge: 1000 * 60 * 60 * 24 * 5,
-      httpOnly: true,
-    });
+    ctx.cookies.set('access_token', token, cookieOptions);
   } catch (error) {
     ctx.throw(500, error);
   }
