@@ -12,10 +12,10 @@ import api from './api';
 
 require('dotenv').config();
 
-const { MONGO_URI, CLIENT_HOST } = process.env;
+const { MONGO_URI } = process.env;
 
 const corsOptions = {
-  origin: CLIENT_HOST,
+  origin: true,
   credentials: true,
 };
 
