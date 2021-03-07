@@ -4,7 +4,7 @@
   "description": "Todo application Backend created using Koa, MongoDB",
   "main": "index.js",
   "scripts": {
-    "start": "node -r esm index.js",
+    "start": "cross-env NODE_ENV=production node -r esm index.js",
     "start:dev": "nodemon --watch src/ src/index.js --exec babel-node",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "npm run test -- --watch-all",
@@ -39,6 +39,7 @@
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "bcrypt": "^5.0.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "joi": "^17.4.0",

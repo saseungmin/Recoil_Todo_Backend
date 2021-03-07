@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/user';
 
+import cookieOptions from '../utils/cookieOptions';
+
 const jwtMiddleware = async (ctx, next) => {
   const token = ctx.cookies.get('access_token');
 
@@ -23,10 +25,7 @@ const jwtMiddleware = async (ctx, next) => {
       const user = await User.findById(decoded._id);
       const token = user.generateToken();
 
-      ctx.cookies.set('access_token', token, {
-        maxAge: 1000 * 60 * 60 * 24 * 5,
-        httpOnly: true,
-      });
+      ctx.cookies.set('access_token', token, cookieOptions);
     }
 
     return next();
