@@ -15,7 +15,7 @@ require('dotenv').config();
 const { MONGO_URI } = process.env;
 
 const corsOptions = {
-  origin: true,
+  origin: '*',
   credentials: true,
 };
 
