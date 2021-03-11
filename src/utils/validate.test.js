@@ -1,16 +1,30 @@
 import { validateUser, validateTodo } from './validate';
 
 describe('validateUser', () => {
-  const user = {
-    id: 'test',
-    password: 'test123',
-  };
+  context('Have Success', () => {
+    const user = {
+      id: 'test',
+      password: 'test123',
+    };
+    it('Successful validation of user schema', () => {
+      const { value, error } = validateUser(user);
 
-  it('Successful validation of user schema', () => {
-    const { value, error } = validateUser(user);
+      expect(value).toEqual(user);
+      expect(error).toBeUndefined();
+    });
+  });
 
-    expect(value).toEqual(user);
-    expect(error).toBeUndefined();
+  context('Have Error', () => {
+    const user = {
+      id: '',
+      password: 'test123',
+    };
+    it('Failure validation of user schema', () => {
+      const { value, error } = validateUser(user);
+
+      expect(value).toEqual(user);
+      expect(error.message).toEqual('빈 값이 존재합니다.');
+    });
   });
 });
 
