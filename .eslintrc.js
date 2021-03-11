@@ -43,5 +43,6 @@ module.exports = {
     'consistent-return': 'off',
     'no-underscore-dangle': ['error', { allow: ['__MONGO_URI__', '_id'] }],
     'func-names': 'off',
+    'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['err', 'ctx'] }],
   },
 };
