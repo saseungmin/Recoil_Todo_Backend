@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import Todo from '../../models/todo';
 
-import { validateTodo } from '../../utils/validate';
+import { validateTodo, validateUpdateTodo } from '../../utils/validate';
 
 const { ObjectId } = mongoose.Types;
 
@@ -101,7 +101,7 @@ export const remove = async (ctx) => {
 export const update = async (ctx) => {
   const { id } = ctx.params;
 
-  const { error, value } = validateTodo(ctx.request.body);
+  const { error, value } = validateUpdateTodo(ctx.request.body);
 
   if (error) {
     ctx.status = 400;
