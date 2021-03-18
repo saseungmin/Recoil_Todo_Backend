@@ -39,3 +39,12 @@ export const validateTodo = (value) => {
 
   return schema.validate(value);
 };
+
+export const validateUpdateTodo = (value) => {
+  const schema = Joi.object().keys({
+    task: Joi.string(),
+    isComplete: Joi.boolean(),
+  });
+
+  return schema.validate(value);
+};

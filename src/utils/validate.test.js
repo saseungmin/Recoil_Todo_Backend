@@ -1,4 +1,4 @@
-import { validateUser, validateTodo } from './validate';
+import { validateUser, validateTodo, validateUpdateTodo } from './validate';
 
 describe('validateUser', () => {
   context('Have Success', () => {
@@ -63,6 +63,33 @@ describe('validateTodo', () => {
       const { error } = validateTodo(todo);
 
       expect(error.message).toBe('"task" is required');
+    });
+  });
+});
+
+describe('validateUpdateTodo', () => {
+  const todo = {
+    task: 'some task',
+  };
+
+  context('Successful validation', () => {
+    it('todo schema is return value', () => {
+      const { value, error } = validateUpdateTodo(todo);
+
+      expect(value).toEqual(todo);
+      expect(error).toBeUndefined();
+    });
+  });
+
+  context('Validation failure', () => {
+    it("When the object's key value is not allowed", () => {
+      const todo = {
+        id: 'test',
+      };
+
+      const { error } = validateUpdateTodo(todo);
+
+      expect(error.message).toBe('"id" is not allowed');
     });
   });
 });
