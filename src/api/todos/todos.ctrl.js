@@ -31,6 +31,38 @@ export const getTodoById = async (ctx, next) => {
   return next();
 };
 
+export const checkTodoByIds = async (ctx, next) => {
+  const { user } = ctx.state;
+  const { body: { ids } } = ctx.request;
+
+  const isObjectId = ids.every((id) => ObjectId.isValid(id));
+
+  if (!isObjectId) {
+    ctx.status = 400;
+    return;
+  }
+
+  try {
+    const ownTodos = await Todo.find()
+      .where('_id')
+      .in(ids)
+      .where('writer._id')
+      .equals(user._id)
+      .exec();
+
+    if (ownTodos.length !== ids.length) {
+      ctx.status = 404;
+      return;
+    }
+
+    return next();
+  } catch (error) {
+    ctx.throw(500, error);
+  }
+
+  return next();
+};
+
 export const checkOwnTodo = (ctx, next) => {
   const { user, todo } = ctx.state;
 
@@ -91,6 +123,18 @@ export const remove = async (ctx) => {
 
   try {
     await Todo.findByIdAndRemove(id).exec();
+
+    ctx.status = 204;
+  } catch (error) {
+    ctx.throw(500, error);
+  }
+};
+
+export const multipleRemove = async (ctx) => {
+  const { body } = ctx.request;
+
+  try {
+    await Todo.deleteMany({ _id: body.ids }).exec();
 
     ctx.status = 204;
   } catch (error) {

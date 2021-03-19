@@ -332,6 +332,62 @@ describe('app', () => {
     });
   });
 
+  describe('DELETE /api/todos/', () => {
+    let sessionCookie;
+    let response;
+
+    const payload = (ids) => ({
+      ids,
+    });
+
+    beforeEach(async () => {
+      const payload = {
+        id: 'seugmin',
+        password: 'test123',
+      };
+
+      sessionCookie = await setSessionCookie(payload);
+
+      const todo = {
+        task: 'task2',
+        isComplete: false,
+      };
+
+      response = await insertTodo(sessionCookie)(todo);
+    });
+
+    context('Is Error status', () => {
+      it('When the objectId is invalid, Response 400', async () => {
+        const { status } = await request(app.callback())
+          .delete('/api/todos')
+          .set('Cookie', sessionCookie)
+          .send(payload(['3']));
+
+        expect(status).toBe(400);
+      });
+
+      it("Couldn't find onw todos with that ObjectId, Response 404", async () => {
+        const { status } = await request(app.callback())
+          .delete('/api/todos/')
+          .set('Cookie', sessionCookie)
+          .send(payload([ObjectId('mockobjectid')]));
+
+        expect(status).toBe(404);
+      });
+    });
+
+    context('Is Successful Status', () => {
+      it('Remove Todos, Response 204', async () => {
+        const { status } = await request(app.callback())
+          .delete('/api/todos/')
+          .set('Cookie', sessionCookie)
+          .send(payload([response._id]));
+
+        expect(status).toBe(204);
+      });
+    });
+  });
+
   describe('PATCH /api/todos/:id', () => {
     let sessionCookie;
     let response;
