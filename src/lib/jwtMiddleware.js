@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/user';
 
-import cookieOptions from '../utils/cookieOptions';
-
 const jwtMiddleware = async (ctx, next) => {
-  const token = ctx.cookies.get('access_token');
+  const { headers } = ctx.request;
+
+  const token = headers.authorization;
 
   if (!token) {
     return next();
@@ -25,7 +25,7 @@ const jwtMiddleware = async (ctx, next) => {
       const user = await User.findById(decoded._id);
       const token = user.generateToken();
 
-      ctx.cookies.set('access_token', token, cookieOptions);
+      ctx.state.accessToken = token;
     }
 
     return next();

@@ -1,7 +1,6 @@
 import User from '../../models/user';
 
 import { validateUser } from '../../utils/validate';
-import cookieOptions from '../../utils/cookieOptions';
 
 export const register = async (ctx) => {
   const { error, value } = validateUser(ctx.request.body);
@@ -28,11 +27,13 @@ export const register = async (ctx) => {
     await user.setPassword(password);
     await user.save();
 
-    ctx.body = user.serialize();
-
     const token = user.generateToken();
 
-    ctx.cookies.set('access_token', token, cookieOptions);
+    ctx.body = {
+      user: user.serialize(),
+      access_token: token,
+    };
+
     ctx.status = 201;
   } catch (e) {
     ctx.throw(500, e);
@@ -62,28 +63,27 @@ export const login = async (ctx) => {
       return;
     }
 
-    ctx.body = user.serialize();
-
     const token = user.generateToken();
 
-    ctx.cookies.set('access_token', token, cookieOptions);
+    ctx.body = {
+      user: user.serialize(),
+      access_token: token,
+    };
   } catch (error) {
     ctx.throw(500, error);
   }
 };
 
 export const check = async (ctx) => {
-  const { user } = ctx.state;
+  const { user, accessToken } = ctx.state;
 
   if (!user) {
     ctx.status = 401;
     return;
   }
 
-  ctx.body = user;
-};
-
-export const logout = async (ctx) => {
-  ctx.cookies.set('access_token');
-  ctx.status = 204;
+  ctx.body = {
+    user,
+    access_token: accessToken,
+  };
 };

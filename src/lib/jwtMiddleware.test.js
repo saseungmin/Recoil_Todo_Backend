@@ -23,12 +23,14 @@ describe('jwtMiddleware', () => {
 
     it('When token is null', async () => {
       const ctx = {
-        cookies: {
-          get: () => null,
-          set: (token) => token,
+        request: {
+          headers: {
+            authorization: 'access_token',
+          },
         },
         state: {
           user: {},
+          accessToken: '',
         },
       };
 
@@ -38,41 +40,47 @@ describe('jwtMiddleware', () => {
     });
     it('When the token is less than two days left', async () => {
       const ctx = {
-        cookies: {
-          get: (token) => token,
-          set: jest.fn(),
+        request: {
+          headers: {
+            authorization: 'access_token',
+          },
         },
         state: {
           user: {},
+          accessToken: '',
         },
       };
+
       const jwtToken = decoded({ exp: 1000 * 60 * 60 * 24 * 2 });
 
       await jwtMiddleware(ctx, next);
 
       expect(jwtToken).toBeCalledWith('access_token', 'mock_jwt_secret');
       expect(findUser).toBeCalled();
-      expect(ctx.cookies.set).toBeCalled();
+      expect(ctx.state.accessToken).toBe('token');
       expect(next).toBeCalledTimes(1);
     });
 
     it('When there are more than two days left', async () => {
       const ctx = {
-        cookies: {
-          get: (token) => token,
-          set: jest.fn(),
+        request: {
+          headers: {
+            authorization: 'access_token',
+          },
         },
         state: {
           user: {},
+          accessToken: '',
         },
       };
+
       const jwtToken = decoded({ exp: Date.now() + (1000 * 60 * 60 * 24 * 5) });
 
       await jwtMiddleware(ctx, next);
 
       expect(jwtToken).toBeCalledWith('access_token', 'mock_jwt_secret');
       expect(findUser).not.toBeCalled();
-      expect(ctx.cookies.set).not.toBeCalled();
+      expect(ctx.state.accessToken).toBe('');
       expect(next).toBeCalledTimes(1);
     });
   });
@@ -80,8 +88,10 @@ describe('jwtMiddleware', () => {
   context('Have Error', () => {
     it('There is a server error.', async () => {
       const ctx = {
-        cookies: {
-          get: (token) => token,
+        request: {
+          headers: {
+            authorization: 'access_token',
+          },
         },
         state: {
           user: {},
