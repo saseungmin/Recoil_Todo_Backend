@@ -26,15 +26,16 @@ describe('app', () => {
       .post('/api/auth/login')
       .send(payload);
 
-    return response.header['set-cookie'][0]
-      .split(',')
-      .map((cookie) => cookie.split(';')[0]);
+    // return response.header['set-cookie'][0]
+    //   .split(',')
+    //   .map((cookie) => cookie.split(';')[0]);
+    return response.body.access_token;
   };
 
-  const insertTodo = (cookie) => async (payload) => {
+  const insertTodo = (token) => async (payload) => {
     const { body } = await request(app.callback())
       .post('/api/todos')
-      .set('Cookie', cookie)
+      .set('Authorization', token)
       .send(payload);
     return body;
   };
@@ -62,7 +63,7 @@ describe('app', () => {
           .send({ id: 'seungmin', password: 'test123' });
 
         expect(status).toBe(201);
-        expect(body).toHaveProperty('id', payload.id);
+        expect(body).toHaveProperty('user.id', payload.id);
       });
     });
 
@@ -108,7 +109,7 @@ describe('app', () => {
           .send(payload);
 
         expect(status).toBe(200);
-        expect(body).toHaveProperty('id', 'seugmin');
+        expect(body).toHaveProperty('user.id', payload.id);
       });
     });
 
@@ -169,10 +170,10 @@ describe('app', () => {
       it('Response is Success response user status', async () => {
         const { status, body } = await request(app.callback())
           .get('/api/auth/check')
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(200);
-        expect(body).toHaveProperty('id', 'seugmin');
+        expect(body).toHaveProperty('user.id', payload.id);
       });
     });
 
@@ -183,27 +184,6 @@ describe('app', () => {
 
         expect(status).toBe(401);
       });
-    });
-  });
-
-  describe('POST /api/auth/logout', () => {
-    let sessionCookie;
-
-    const payload = {
-      id: 'seugmin',
-      password: 'test123',
-    };
-
-    beforeEach(async () => {
-      sessionCookie = await setSessionCookie(payload);
-    });
-
-    it('When logout success, delete cookie Response 204', async () => {
-      const { status } = await request(app.callback())
-        .post('/api/auth/logout')
-        .set('Cookie', sessionCookie);
-
-      expect(status).toBe(204);
     });
   });
 
@@ -228,7 +208,7 @@ describe('app', () => {
 
         const { status, body } = await request(app.callback())
           .post('/api/todos')
-          .set('Cookie', sessionCookie)
+          .set('Authorization', sessionCookie)
           .send(payload);
 
         expect(status).toBe(400);
@@ -245,7 +225,7 @@ describe('app', () => {
 
         const { status, body } = await request(app.callback())
           .post('/api/todos')
-          .set('Cookie', sessionCookie)
+          .set('Authorization', sessionCookie)
           .send(payload);
 
         expect(status).toBe(201);
@@ -276,7 +256,7 @@ describe('app', () => {
     it('When successful load to todos, Response 200', async () => {
       const { status, body } = await request(app.callback())
         .get('/api/todos')
-        .set('Cookie', sessionCookie);
+        .set('Authorization', sessionCookie);
 
       expect(status).toBe(200);
       expect(body[0]).toHaveProperty('task', 'task1');
@@ -307,7 +287,7 @@ describe('app', () => {
       it('When the objectId is invalid, Response 400', async () => {
         const { status } = await request(app.callback())
           .delete('/api/todos/1')
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(400);
       });
@@ -315,7 +295,7 @@ describe('app', () => {
       it("Couldn't find todo with that ObjectId, Response 404", async () => {
         const { status } = await request(app.callback())
           .delete(`/api/todos/${ObjectId('mockobjectid')}`)
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(404);
       });
@@ -325,7 +305,7 @@ describe('app', () => {
       it('Remove Todo, Response 204', async () => {
         const { status } = await request(app.callback())
           .delete(`/api/todos/${response._id}`)
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(204);
       });
@@ -360,7 +340,7 @@ describe('app', () => {
       it('When the objectId is invalid, Response 400', async () => {
         const { status } = await request(app.callback())
           .delete('/api/todos')
-          .set('Cookie', sessionCookie)
+          .set('Authorization', sessionCookie)
           .send(payload(['3']));
 
         expect(status).toBe(400);
@@ -369,7 +349,7 @@ describe('app', () => {
       it("Couldn't find onw todos with that ObjectId, Response 404", async () => {
         const { status } = await request(app.callback())
           .delete('/api/todos/')
-          .set('Cookie', sessionCookie)
+          .set('Authorization', sessionCookie)
           .send(payload([ObjectId('mockobjectid')]));
 
         expect(status).toBe(404);
@@ -380,7 +360,7 @@ describe('app', () => {
       it('Remove Todos, Response 204', async () => {
         const { status } = await request(app.callback())
           .delete('/api/todos/')
-          .set('Cookie', sessionCookie)
+          .set('Authorization', sessionCookie)
           .send(payload([response._id]));
 
         expect(status).toBe(204);
@@ -417,7 +397,7 @@ describe('app', () => {
         const { body, status } = await request(app.callback())
           .patch(`/api/todos/${response._id}`)
           .send(payload)
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(400);
         expect(body.details[0].message).toBe('"task" is not allowed to be empty');
@@ -433,7 +413,7 @@ describe('app', () => {
         const { status } = await request(app.callback())
           .patch(`/api/todos/${response._id}`)
           .send({ task: 'task1' })
-          .set('Cookie', mockCookie);
+          .set('Authorization', mockCookie);
 
         expect(status).toBe(403);
       });
@@ -449,7 +429,7 @@ describe('app', () => {
         const { status, body } = await request(app.callback())
           .patch(`/api/todos/${response._id}`)
           .send(payload)
-          .set('Cookie', sessionCookie);
+          .set('Authorization', sessionCookie);
 
         expect(status).toBe(200);
         expect(body.isComplete).toBe(payload.isComplete);
